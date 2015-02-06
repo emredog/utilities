@@ -1,4 +1,7 @@
 //------------------------------------------------
+// Code obtained from: https://groups.google.com/d/msg/openni-dev/GqeX5s_nVcY/Ec5DRJAIqfgJ
+//------------------------------------------------
+//
 // STL Header
 #include <iostream>
 #include <fstream>
