@@ -47,6 +47,7 @@ void xdepth2opencv(xn::DepthMetaData &xDepthMap, cv::Mat &im, int verbose=0)
         printf("xdepth2opencv: w %d, h %d\n", w, h);
 
     const cv::Mat tmp(h, w, CV_16U, ( void *)xDepthMap.Data());
+
     tmp.copyTo(im);
 
 }
