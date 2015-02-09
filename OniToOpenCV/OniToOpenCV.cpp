@@ -15,6 +15,9 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+//Qt
+#include <QDir>
+
 #include <stdlib.h>
 /**
  * @brief Function similar to printf returning C++ style string
@@ -76,7 +79,13 @@ int main( int argc, char** argv )
 
     std::string outputdir = "./";
     if (argc>2)
+    {
         outputdir = argv[2];
+        if (!QDir(QString::fromStdString(outputdir)).exists())
+        {
+            QDir().mkdir(QString::fromStdString(outputdir));
+        }
+    }
 
     // Initial OpenNI Context
     xn::Context xContext;
