@@ -59,7 +59,9 @@ void ximage2opencv(xn::ImageMetaData &xImageMap, cv::Mat &im, int verbose=0)
 
     const XnRGB24Pixel * xx=xImageMap.RGB24Data();
     const cv::Mat tmp(h, w, CV_8UC3, ( void *)xx);
-    tmp.copyTo(im);
+    const cv::Mat tmp2(h, w, CV_8UC3);
+    cv::cvtColor(tmp, tmp2, CV_RGB2BGR); // OpenCV works on BGR instead of RGB !!!
+    tmp2.copyTo(im);
 }
 
 

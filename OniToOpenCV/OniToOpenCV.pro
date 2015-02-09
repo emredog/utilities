@@ -20,4 +20,4 @@ SOURCES += \
 
 INCLUDEPATH += /usr/include/ni
 
-LIBS += -lopencv_core -lopencv_highgui -lOpenNI
+LIBS += -lopencv_core -lopencv_highgui -lopencv_imgproc -lOpenNI
