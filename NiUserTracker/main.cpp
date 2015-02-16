@@ -26,6 +26,8 @@
 #include <XnCppWrapper.h>
 #include "SceneDrawer.h"
 #include <XnPropNames.h>
+#include "Capture.h"
+#include "globals.h"
 
 //---------------------------------------------------------------------------
 // Globals
@@ -305,6 +307,17 @@ void glutKeyboard (unsigned char key, int /*x*/, int /*y*/)
 	case 'L':
 		LoadCalibration();
 		break;
+    case 'a':
+        //Start recording
+        captureStart(0, &g_Context);
+        break;
+    case 'd':
+        //Start delayed
+        captureStart(5, &g_Context);
+        break;
+    case 'z':
+        captureStop(0);
+        break;
 	}
 }
 void glInit (int * pargc, char ** argv)
@@ -371,6 +384,8 @@ int main(int argc, char **argv)
 			return (nRetVal);
 		}
 	}
+
+    captureInit();
 
 	nRetVal = g_Context.FindExistingNode(XN_NODE_TYPE_DEPTH, g_DepthGenerator);
 	if (nRetVal != XN_STATUS_OK)
@@ -452,7 +467,7 @@ int main(int argc, char **argv)
 	CHECK_RC(nRetVal, "Register to calibration in progress");
 
 	nRetVal = g_Context.StartGeneratingAll();
-	CHECK_RC(nRetVal, "StartGenerating");
+	CHECK_RC(nRetVal, "StartGenerating");        
 
 #ifndef USE_GLES
 	glInit(&argc, argv);

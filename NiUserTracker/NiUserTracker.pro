@@ -18,7 +18,8 @@ TEMPLATE = app
 SOURCES += \
     main.cpp \
     opengles.cpp \
-    SceneDrawer.cpp
+    SceneDrawer.cpp \
+    Capture.cpp
 
 HEADERS += \
     opengles.h \
@@ -46,7 +47,8 @@ HEADERS += \
     glh/glh_linear.h \
     glh/glh_mipmaps.h \
     glh/glh_obs.h \
-    glh/glh_text.h
+    glh/glh_text.h \
+    Capture.h
 
 INCLUDEPATH += /usr/include/ni
 

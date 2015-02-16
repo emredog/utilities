@@ -77,12 +77,18 @@ int main(int argc, char *argv[])
             {
                 unsigned short depthInMM = pSource[j];
                 float depthInM = float(depthInMM) / 1000.0;
-
-                unsigned short rawDepth;
-                rawDepth = (unsigned short)((1.0 / (depthInM * -0.0030711016)) - subtractMe);
-                if (rawDepth > 0 && rawDepth < 2047)
+                if( depthInM < 0.3002  ||  depthInM > 533.2248 )
                 {
-                    pTarget[j] = rawDepth;
+                    pTarget[j] = (unsigned short)2047;
+                }
+                else
+                {
+                    unsigned short rawDepth;
+                    rawDepth = (unsigned short)round(((1.0 / (depthInM * -0.0030711016)) - subtractMe));
+                    if (rawDepth > 0 && rawDepth < 2047)
+                    {
+                        pTarget[j] = rawDepth;
+                    }
                 }
 
 
