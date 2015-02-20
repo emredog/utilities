@@ -6,8 +6,12 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <QString>
+
 using namespace cv;
 using namespace std;
+
+#define HARD_HEIGHT_LIMIT 150
 
 int main(int argc, char** argv)
 {
@@ -40,6 +44,8 @@ int main(int argc, char** argv)
     hog.setSVMDetector(HOGDescriptor::getDefaultPeopleDetector());
     namedWindow("people detector", 1);
 
+    int counter = 0;
+
     for(;;)
     {
         char* filename = _filename;
@@ -59,7 +65,10 @@ int main(int argc, char** argv)
         }
         printf("%s:\n", filename);
         if(!img.data)
+        {
+            printf("\tCould not read image!\n");
             continue;
+        }
 
         fflush(stdout);
         vector<Rect> found, found_filtered;
@@ -69,7 +78,7 @@ int main(int argc, char** argv)
         // groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
         hog.detectMultiScale(img, found, 0, Size(8,8), Size(32,32), 1.05, 2);
         t = (double)getTickCount() - t;
-        printf("tdetection time = %gms\n", t*1000./cv::getTickFrequency());
+        printf("\tDetection time = %gms\n", t*1000./cv::getTickFrequency());
         size_t i, j;
         for( i = 0; i < found.size(); i++ )
         {
@@ -85,16 +94,60 @@ int main(int argc, char** argv)
             Rect r = found_filtered[i];
             // the HOG detector returns slightly larger rectangles than the real objects.
             // so we slightly shrink the rectangles to get a nicer output.
-            r.x += cvRound(r.width*0.1);
-            r.width = cvRound(r.width*0.8);
-            r.y += cvRound(r.height*0.07);
-            r.height = cvRound(r.height*0.8);
-            rectangle(img, r.tl(), r.br(), cv::Scalar(0,255,0), 3);
+            //EMREDOG: I'm commenting these shrink operation.
+//            r.x += cvRound(r.width*0.1);
+//            r.width = cvRound(r.width*0.8);
+//            r.y += cvRound(r.height*0.07);
+//            r.height = cvRound(r.height*0.8);
+
+            //EMREDOG: No overlay on original image
+            //rectangle(img, r.tl(), r.br(), cv::Scalar(0,255,0), 3);
+
+
+            printf("\tSaving image...\n");
+
+            //EMREDOG: crop & save image
+            if (r.area() > 0)
+            {
+                t = (double)getTickCount();
+                //EMREDOG: get rectangle within image boundaries
+                if (r.x < 0) r.x = 0;
+                if (r.y < 0) r.y = 0;
+                if (r.x + r.width   > img.cols) r.width     = img.cols - r.x;
+                if (r.y + r.height  > img.rows) r.height    = img.rows - r.y;
+                Mat cropped = img(r);
+                t = (double)getTickCount() - t;
+                printf("\tCrop time = %gms\n", t*1000./cv::getTickFrequency());
+
+                //EMREDOG check height, and scale down if necessary
+                if (cropped.rows > HARD_HEIGHT_LIMIT)
+                {
+                    t = (double)getTickCount();
+                    double downScale = (double)HARD_HEIGHT_LIMIT / (double)cropped.rows;
+                    Mat dst;
+                    resize(cropped, dst, Size(), downScale, downScale, INTER_NEAREST);
+                    cropped = dst;
+                    t = (double)getTickCount() - t;
+                    printf("\tScale-down time = %gms\n", t*1000./cv::getTickFrequency());
+                }
+
+
+                imwrite(QString("%1_cropped.png").arg(counter + 1, 3, 10, QChar('0')).toStdString(), cropped);
+            }
+            else
+            {
+                imwrite(QString("%1_original.png").arg(counter + 1, 3, 10, QChar('0')).toStdString(), img);
+            }
+
         }
-        imshow("people detector", img);
-        int c = waitKey(0) & 255;
-        if( c == 'q' || c == 'Q' || !f)
-            break;
+
+        counter++;
+
+        //EMREDOG: No display
+        //imshow("people detector", img);
+        //int c = waitKey(0) & 255;
+        //if( c == 'q' || c == 'Q' || !f)
+        //    break;
     }
     if(f)
         fclose(f);
